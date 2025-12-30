@@ -1,0 +1,132 @@
+.blood-search-container {
+    display: flex;
+    justify-content: center;
+    padding: 0 1rem;
+    margin-top: -4rem;
+    /* Overlap with Hero */
+    position: relative;
+    z-index: 20;
+    margin-bottom: 3rem;
+}
+
+.blood-search-card {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--radius);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    border: 1px solid var(--border);
+}
+
+.search-heading {
+    text-align: center;
+    color: var(--secondary);
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.search-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.search-type-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.type-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.toggle-wrapper {
+    display: flex;
+    background-color: var(--background);
+    padding: 0.25rem;
+    border-radius: var(--radius);
+}
+
+.type-btn {
+    flex: 1;
+    padding: 0.6rem;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-weight: 600;
+    border-radius: calc(var(--radius) - 2px);
+    transition: all 0.2s;
+}
+
+.type-btn.active {
+    background-color: white;
+    color: var(--primary);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.input-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.form-select {
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+    background-color: white;
+}
+
+.form-select:focus {
+    border-color: var(--primary);
+}
+
+.input-error {
+    border-color: #e03131;
+}
+
+.error-msg {
+    color: #e03131;
+    font-size: 0.85rem;
+    margin-top: -0.25rem;
+}
+
+.search-btn {
+    background-color: var(--primary);
+    color: white;
+    padding: 1rem;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: 700;
+    margin-top: 0.5rem;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.search-btn:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.search-btn:active {
+    transform: translateY(1px);
+}
+
+@media (max-width: 600px) {
+    .blood-search-container {
+        margin-top: -2rem;
+    }
+}
