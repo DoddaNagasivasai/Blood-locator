@@ -9,7 +9,9 @@ export default function DonorDashboard() {
         phone: user?.phone || '',
         city: user?.city || '',
         bloodGroup: user?.bloodGroup || '',
-        availabilityStatus: true
+        availabilityStatus: true,
+        latitude: null,    // ADD THIS
+        longitude: null    // ADD THIS
     });
     const [nearbyRequests, setNearbyRequests] = useState([]);
     const [selectedRequest, setSelectedRequest] = useState(null); // For detail modal
@@ -92,7 +94,49 @@ export default function DonorDashboard() {
     };
 
     if (loading) return <div className="container" style={{ marginTop: '2rem' }}>Loading...</div>;
+    const detectLocation = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const { latitude, longitude } = position.coords;
 
+                    try {
+                        const response = await fetch(
+                            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+                        );
+                        const data = await response.json();
+                        const city = data.address.city || data.address.town || data.address.village || '';
+                        setDonorData(prev => ({
+                            ...prev,
+                            city: city,
+                            latitude: latitude,    // ADD THIS
+                            longitude: longitude   // ADD THIS
+                        }));
+
+                        if (data.results && data.results[0]) {
+                            const addressComponents = data.results[0].address_components;
+                            const city = addressComponents.find(
+                                component => component.types.includes('locality')
+                            )?.long_name || '';
+
+                            setDonorData(prev => ({
+                                ...prev,
+                                city: city,
+                                latitude: latitude,    // ADD THIS
+                                longitude: longitude   // ADD THIS
+                            }));
+                            setMessage({ type: 'success', text: 'Location detected successfully!' });
+                        }
+                    } catch (error) {
+                        setMessage({ type: 'error', text: 'Failed to detect location' });
+                    }
+                },
+                (error) => {
+                    setMessage({ type: 'error', text: 'Location permission denied' });
+                }
+            );
+        }
+    };
     return (
         <div className="dashboard">
             <div className="dashboard-header">
@@ -154,18 +198,28 @@ export default function DonorDashboard() {
                                     placeholder="Phone number"
                                 />
                             </div>
-
                             <div className="form-group">
                                 <label>City</label>
-                                <input
-                                    type="text"
-                                    name="city"
-                                    className="form-control"
-                                    value={donorData.city}
-                                    onChange={handleChange}
-                                    required
-                                    placeholder="Enter city"
-                                />
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <input
+                                        type="text"
+                                        name="city"
+                                        className="form-control"
+                                        value={donorData.city}
+                                        onChange={handleChange}
+                                        required
+                                        placeholder="Enter city"
+                                        style={{ flex: 1 }}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={detectLocation}
+                                        className="btn btn-secondary"
+                                        style={{ padding: '0.5rem 1rem', whiteSpace: 'nowrap' }}
+                                    >
+                                        📍 Detect
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '1.5rem' }}>

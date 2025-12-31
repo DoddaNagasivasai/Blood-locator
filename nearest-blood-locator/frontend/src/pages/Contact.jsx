@@ -51,7 +51,7 @@ export default function Contact() {
                     <div className="info-card emergency-card">
                         <h3>🚨 Emergency Support</h3>
                         <p>Need blood urgently? Call our 24/7 helpline immediately.</p>
-                        <a href="tel:+18001234567" className="emergency-btn">Call 1800-123-4567</a>
+                        <a href="tel:+1800-123-4567" className="emergency-btn">Call 1800-123-4567</a>
                     </div>
 
                     <div className="info-card">

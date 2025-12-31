@@ -1,0 +1,36 @@
+.user-type-container {
+  text-align: center;
+  padding: 2rem;
+}
+
+.user-type-cards {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.card {
+  background: #f9f9f9;
+  border: 2px solid #ddd;
+  padding: 1.5rem;
+  border-radius: 10px;
+  width: 220px;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  border-color: #e63946;
+}
+
+.card h3 {
+  margin-top: 0.5rem;
+}
+
+.card p {
+  font-size: 0.9rem;
+  color: #555;
+}

@@ -12,6 +12,11 @@ class Donor(db.Model):
     age = db.Column(db.Integer, nullable=True)
     phone = db.Column(db.String(20), nullable=False)
     city = db.Column(db.String(100), nullable=False)
+    
+    # ✅ Added location fields
+    latitude = db.Column(db.Float, nullable=True)
+    longitude = db.Column(db.Float, nullable=True)
+    
     availability_status = db.Column(db.Boolean, default=True)
     last_donation_date = db.Column(db.Date, nullable=True)
     
@@ -27,12 +32,14 @@ class Donor(db.Model):
             "id": self.id,
             "userId": self.user_id,
             "name": self.name,
-            "fullName": self.name, # For ResultsSection compatibility
+            "fullName": self.name,
             "bloodGroup": self.blood_group,
             "age": self.age,
-            "phoneNumber": self.phone, # Renamed for ResultsSection
-            "location": self.city, # Renamed for ResultsSection
-            "availabilityStatus": "Available" if self.availability_status else "Unavailable", # String for ResultsSection check
+            "phoneNumber": self.phone,
+            "location": self.city,
+            "latitude": self.latitude,  # ✅ Added
+            "longitude": self.longitude,  # ✅ Added
+            "availabilityStatus": "Available" if self.availability_status else "Unavailable",
             "createdAt": self.created_at.isoformat() if self.created_at else None
         }
 

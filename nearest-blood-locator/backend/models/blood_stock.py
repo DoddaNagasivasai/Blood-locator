@@ -2,7 +2,7 @@ from extensions import db
 import datetime
 
 class BloodStock(db.Model):
-    __bind_key__ = 'blood_bank'
+    # __bind_key__ = 'blood_bank'
     __tablename__ = 'blood_stock'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

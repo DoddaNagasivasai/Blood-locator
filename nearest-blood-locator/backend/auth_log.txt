@@ -1,0 +1,18 @@
+Starting Log
+--- Setting up test environment ---
+
+--- Testing Model Logic Directly ---
+Password Hash: $2b$12$mXSiKNuzvvblnvleE0bhWOfv129ftWKfLjRVcQfX3/RnyKLaQhaIO
+Direct Check (Correct Password): True
+Direct Check (Wrong Password): False
+
+--- Testing API Flow ---
+Registering...
+Register Status: 201
+Register Response: {'msg': 'Registration successful', 'user': {'createdAt': '2025-12-31T04:28:38', 'email': 'api999@example.com', 'id': 9, 'isAvailable': True, 'phone': '1234567890', 'role': 'donor', 'username': 'api_user_999'}}
+Logging in with Email...
+Login Status: 200
+Login Response: {'access_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2NzE1NTMxNywianRpIjoiOTUzMTQ0MGItMmE0My00ZjA0LWE2YWMtNTI3M2IzYzI1NzU0IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjkiLCJuYmYiOjE3NjcxNTUzMTcsImNzcmYiOiJjZmMzMDU4OS01MTMxLTRlMWItODg2OS01ZWI0NDg4ODBkYzgiLCJleHAiOjE3NjcyNDE3MTcsInVzZXJuYW1lIjoiYXBpX3VzZXJfOTk5IiwiZW1haWwiOiJhcGk5OTlAZXhhbXBsZS5jb20iLCJyb2xlIjoiZG9ub3IifQ.8H75XwyyTHrNcfv7gL-Nzu_-Iz6Edhahr9J_blgeUh8', 'msg': 'Login successful', 'user': {'createdAt': '2025-12-31T04:28:38', 'email': 'api999@example.com', 'id': 9, 'isAvailable': True, 'phone': '1234567890', 'role': 'donor', 'username': 'api_user_999'}}
+Logging in with Username...
+Login Status: 200
+Login Response: {'access_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2NzE1NTMxOCwianRpIjoiZTA3YzdjZWYtZjYyMi00YmRjLThlODItNGJhNWM4NjhjYzMxIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjkiLCJuYmYiOjE3NjcxNTUzMTgsImNzcmYiOiI0NTVlNzgxZi03NzIwLTQzNDQtOGQwNy1mZTJkNzFhNGI4ZDkiLCJleHAiOjE3NjcyNDE3MTgsInVzZXJuYW1lIjoiYXBpX3VzZXJfOTk5IiwiZW1haWwiOiJhcGk5OTlAZXhhbXBsZS5jb20iLCJyb2xlIjoiZG9ub3IifQ.NFHnt4vp8vXFtxKYskaHprV3gNpV7ZyAxiN7bMcbfIc', 'msg': 'Login successful', 'user': {'createdAt': '2025-12-31T04:28:38', 'email': 'api999@example.com', 'id': 9, 'isAvailable': True, 'phone': '1234567890', 'role': 'donor', 'username': 'api_user_999'}}

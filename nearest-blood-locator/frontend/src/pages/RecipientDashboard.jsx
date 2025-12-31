@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import SearchSection from './SearchSection';
 import ResultsSection from '../components/ResultsSection';
 import './Dashboard.css';
+import MapNavigationButton from '../components/MapNavigationButton';
 
 export default function RecipientDashboard() {
     const { user } = useAuth();
@@ -124,6 +125,39 @@ export default function RecipientDashboard() {
             setMessage({ type: 'error', text: "Connection error. Please try again." });
         }
     };
+    const detectLocationForRequest = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const { latitude, longitude } = position.coords;
+
+                    try {
+                        const response = await fetch(
+                            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+                        );
+                        const data = await response.json();
+                        const city = data.address.city || data.address.town || data.address.village || '';
+                        setFormData(prev => ({ ...prev, city: city }));
+
+                        if (data.results && data.results[0]) {
+                            const addressComponents = data.results[0].address_components;
+                            const city = addressComponents.find(
+                                component => component.types.includes('locality')
+                            )?.long_name || '';
+
+                            setRequestData(prev => ({ ...prev, city: city }));
+                            setMessage({ type: 'success', text: 'Location detected!' });
+                        }
+                    } catch (error) {
+                        setMessage({ type: 'error', text: 'Failed to detect location' });
+                    }
+                },
+                (error) => {
+                    setMessage({ type: 'error', text: 'Location permission denied' });
+                }
+            );
+        }
+    };
 
     return (
         <div className="dashboard">
@@ -198,14 +232,25 @@ export default function RecipientDashboard() {
                                     </div>
                                     <div className="form-group">
                                         <label>City/Location</label>
-                                        <input
-                                            type="text"
-                                            name="city"
-                                            className="form-control"
-                                            value={requestData.city}
-                                            onChange={handleRequestChange}
-                                            required
-                                        />
+                                        <div style={{ display: 'flex', gap: '10px' }}>
+                                            <input
+                                                type="text"
+                                                name="city"
+                                                className="form-control"
+                                                value={requestData.city}
+                                                onChange={handleRequestChange}
+                                                required
+                                                style={{ flex: 1 }}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={detectLocationForRequest}
+                                                className="btn btn-secondary"
+                                                style={{ padding: '0.5rem 1rem', whiteSpace: 'nowrap' }}
+                                            >
+                                                📍 Detect
+                                            </button>
+                                        </div>
                                     </div>
                                     <div className="form-group">
                                         <label>Contact Phone</label>

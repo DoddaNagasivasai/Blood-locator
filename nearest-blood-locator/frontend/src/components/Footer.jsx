@@ -16,8 +16,7 @@ export default function Footer() {
                         <li><Link to="/">Home</Link></li>
                         <li><Link to="/about">About Us</Link></li>
                         <li><Link to="/contact">Contact</Link></li>
-                        <li><a href="/#donors">Find Donors</a></li>
-                        <li><a href="/#banks">Blood Banks</a></li>
+
                     </ul>
                 </div>
                 <div className="footer-column">

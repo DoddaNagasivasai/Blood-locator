@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Register.css';
 
@@ -11,19 +11,26 @@ export default function Register() {
 
   // State
   const [formData, setFormData] = useState({
-    userType: 'donor', // donor, bank, recipient
+    userType: 'donor',
     username: '',
     email: '',
     phone: '',
     city: '',
     bloodGroup: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    latitude: null,
+    longitude: null
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [validationErrors, setValidationErrors] = useState({});
+
+  // Auto-detect location on component mount
+  useEffect(() => {
+    detectLocation();
+  }, []);
 
   // Handlers
   const handleChange = (e) => {
@@ -40,24 +47,48 @@ export default function Register() {
         [name]: null
       }));
     }
+
+    // Clear general error on change
+    if (error) {
+      setError('');
+    }
   };
 
   const validate = () => {
     const errors = {};
 
-    if (!formData.username.trim()) errors.username = "Username is required";
-    if (!formData.email.trim()) errors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) errors.email = "Email is invalid";
-
-    if (!formData.phone.trim()) errors.phone = "Phone number is required";
-    if (!formData.city.trim()) errors.city = "Location is required";
-
-    if (formData.userType === 'donor' && !formData.bloodGroup) {
-      errors.bloodGroup = "Blood group is required for donors";
+    if (!formData.username.trim()) {
+      errors.username = "Username is required";
+    } else if (formData.username.trim().length < 3) {
+      errors.username = "Username must be at least 3 characters";
     }
 
-    if (!formData.password) errors.password = "Password is required";
-    else if (formData.password.length < 6) errors.password = "Password must be at least 6 chars";
+    if (!formData.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = "Email is invalid";
+    }
+
+    if (!formData.phone.trim()) {
+      errors.phone = "Phone number is required";
+    } else if (formData.phone.trim().length < 10) {
+      errors.phone = "Phone number must be at least 10 digits";
+    }
+
+    if (!formData.city.trim()) {
+      errors.city = "Location is required";
+    }
+
+    // Blood group validation for donor and recipient
+    if ((formData.userType === 'donor' || formData.userType === 'recipient') && !formData.bloodGroup) {
+      errors.bloodGroup = `Blood group is required for ${formData.userType}s`;
+    }
+
+    if (!formData.password) {
+      errors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      errors.password = "Password must be at least 6 characters";
+    }
 
     if (formData.password !== formData.confirmPassword) {
       errors.confirmPassword = "Passwords do not match";
@@ -67,27 +98,85 @@ export default function Register() {
     return Object.keys(errors).length === 0;
   };
 
+  const detectLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+            );
+            const data = await response.json();
+            const city = data.address.city ||
+              data.address.town ||
+              data.address.village ||
+              data.address.county ||
+              '';
+
+            setFormData(prev => ({
+              ...prev,
+              city: city,
+              latitude: latitude,
+              longitude: longitude
+            }));
+          } catch (error) {
+            console.error('Error getting city name:', error);
+            // Still save coordinates even if reverse geocoding fails
+            setFormData(prev => ({
+              ...prev,
+              latitude: latitude,
+              longitude: longitude
+            }));
+          }
+        },
+        (error) => {
+          console.error('Location permission denied:', error);
+          setError('Location access denied. Please enter your city manually.');
+        }
+      );
+    } else {
+      setError('Geolocation is not supported by your browser. Please enter your city manually.');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validate()) return;
+
+    // Validate form
+    if (!validate()) {
+      setError('Please fix the errors above');
+      return;
+    }
 
     setLoading(true);
     setError('');
 
     try {
-      // Prepare payload - only send relevant fields
+      // Prepare payload
       const payload = {
-        username: formData.username,
-        email: formData.email,
-        phone: formData.phone,
-        city: formData.city,
+        username: formData.username.trim().toLowerCase(),
+        email: formData.email.trim().toLowerCase(),
+        phone: formData.phone.trim(),
+        city: formData.city.trim(),
         password: formData.password,
-        userType: formData.userType
+        userType: formData.userType,
+        latitude: formData.latitude,
+        longitude: formData.longitude
       };
 
-      if (formData.userType === 'donor') {
+      // Add blood group for donors and recipients
+      if ((formData.userType === 'donor' || formData.userType === 'recipient') && formData.bloodGroup) {
         payload.bloodGroup = formData.bloodGroup;
       }
+
+      console.log('Sending registration data:', {
+        ...payload,
+        password: '***',
+        latitude: payload.latitude,
+        longitude: payload.longitude
+      });
 
       const response = await fetch(`${API_URL}/register`, {
         method: 'POST',
@@ -98,15 +187,17 @@ export default function Register() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.msg || "Registration failed");
+        throw new Error(data.msg || data.error || "Registration failed");
       }
 
       // Success
+      console.log('Registration successful:', data);
       alert("Registration successful! Please login.");
       navigate('/login');
 
     } catch (err) {
       setError(err.message);
+      console.error('Registration error:', err);
     } finally {
       setLoading(false);
     }
@@ -178,21 +269,39 @@ export default function Register() {
 
           <div className="form-group">
             <label>City / Location</label>
-            <input
-              type="text"
-              name="city"
-              value={formData.city}
-              onChange={handleChange}
-              placeholder="New York, NY"
-              className={validationErrors.city ? 'error' : ''}
-            />
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <input
+                type="text"
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+                placeholder="New York, NY"
+                className={validationErrors.city ? 'error' : ''}
+                style={{ flex: 1 }}
+              />
+              <button
+                type="button"
+                onClick={detectLocation}
+                className="btn-detect-location"
+                style={{ padding: '0.5rem 1rem', whiteSpace: 'nowrap' }}
+              >
+                📍 Detect
+              </button>
+            </div>
             {validationErrors.city && <span className="error-text">{validationErrors.city}</span>}
+            {formData.latitude && formData.longitude && (
+              <small style={{ color: '#16a085', marginTop: '0.25rem', display: 'block' }}>
+                ✓ Location detected ({formData.latitude.toFixed(4)}, {formData.longitude.toFixed(4)})
+              </small>
+            )}
           </div>
 
-          {/* Conditional Blood Group Field */}
-          {formData.userType === 'donor' && (
+          {/* Conditional Blood Group Field - Show for donors AND recipients */}
+          {(formData.userType === 'donor' || formData.userType === 'recipient') && (
             <div className="form-group full-width fade-in">
-              <label>Blood Group</label>
+              <label>
+                {formData.userType === 'donor' ? 'Blood Group' : 'Required Blood Group'}
+              </label>
               <select
                 name="bloodGroup"
                 value={formData.bloodGroup}

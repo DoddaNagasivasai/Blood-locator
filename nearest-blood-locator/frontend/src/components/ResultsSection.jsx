@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './ResultsSection.css';
-
+import MapNavigationButton from './MapNavigationButton';
+import EmbeddedMapView from '../components/EmbeddedMapView';
 export default function ResultsSection({ results, searchMeta }) {
     const [selectedDonor, setSelectedDonor] = useState(null);
     const [showModal, setShowModal] = useState(false);
@@ -60,6 +61,13 @@ export default function ResultsSection({ results, searchMeta }) {
                                     <div className="detail-row">
                                         <span className="icon">🩸</span>
                                         <span className="detail-text"><strong>{searchMeta.bloodGroup}</strong></span>
+                                    </div>
+                                    <div style={{ marginTop: '1rem' }}>
+                                        <MapNavigationButton
+                                            destinationLat={item.latitude}
+                                            destinationLng={item.longitude}
+                                            destinationName={item.fullName || item.name}
+                                        />
                                     </div>
                                     <div className="detail-row">
                                         <span className="icon">📍</span>
@@ -134,6 +142,11 @@ export default function ResultsSection({ results, searchMeta }) {
                                     <span className={`detail-value ${selectedDonor.availabilityStatus === 'Available' ? 'status-available' : 'status-unavailable'}`}>
                                         {selectedDonor.availabilityStatus}
                                     </span>
+                                    <EmbeddedMapView
+                                        destinationLat={selectedDonor.latitude}
+                                        destinationLng={selectedDonor.longitude}
+                                        destinationName={selectedDonor.fullName || selectedDonor.name}
+                                    />
                                 </div>
                                 {selectedDonor.createdAt && (
                                     <div className="donor-detail-item">
